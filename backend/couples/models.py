@@ -22,3 +22,13 @@ class Couple(models.Model):
 
     def __str__(self):
         return f"Couple: {self.user1.email} & {self.user2.email}"
+    
+class Mood(models.Model):
+    user = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='current_mood')
+    couple = models.ForeignKey(Couple, on_delete=models.CASCADE, related_name='moods')
+    emoji = models.CharField(max_length=10)
+    text=models.CharField(max_length=100, blank=True, null=True)
+    updated_at = models.DateTimeField(auto_now=True)    # Automatically updates timestap on save
+
+    def __str__(self):
+        return f"{self.user.email} feeling {self.emoji}"
