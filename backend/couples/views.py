@@ -3,7 +3,8 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
-from .models import InviteCode, Couple
+from .models import InviteCode, Couple, Mood
+from couples.utils import get_user_couple
 
 class GenerateInviteView(APIView):
     permission_classes = [IsAuthenticated]
@@ -49,3 +50,21 @@ class JoinCoupleView(APIView):
             invite.save()
         
         return Response({"message": "Successfully paired!", "couple_id": couple.id}, status=status.HTTP_200_OK)
+    
+class MoodUpdateView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        couple = get_user_couple(request.user)
+        moods = Mood.objects.filter(couple=couple)
+        data = [{"user_id": m.user.id, "emoji": m.emoji, "text": m.text, "updated_at": m.updated_at} for m in moods]
+        return Response(data)
+
+    def post(self, request):
+        couple = get_user_couple(request.user)
+        mood, created = Mood.objects.update_or_create(
+            user=request.user,
+            couple=couple,
+            defaults={'emoji': request.data.get('emoji', '😐'), 'text': request.data.get('text', '')}
+        )
+        return Response({"message": "Mood updated", "emoji": mood.emoji})
