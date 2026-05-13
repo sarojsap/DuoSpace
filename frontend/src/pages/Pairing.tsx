@@ -1,0 +1,1 @@
+export default function Pairing() { return <div className="p-4">Pairing Page</div>; }

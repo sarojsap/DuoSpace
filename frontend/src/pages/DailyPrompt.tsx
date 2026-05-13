@@ -1,0 +1,1 @@
+export default function DailyPrompt() { return <div className="p-4">Daily Prompt</div>; }
